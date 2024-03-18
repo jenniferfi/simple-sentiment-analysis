@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<li class="is-active">
+    <a href="#" aria-current="page">
+        <span class="icon is-small">
+            <i class="mdi mdi-home-outline" aria-hidden="true"></i>
+        </span>
+        <span>Home</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block main %}
+<!-- Form container-->
+<div id="form-box" class="box content">
+
+    <div>
+        <span><img id="index-img" class="center" src="{{ url_for('static', filename='images/sentiment_meter.png')}}"></span>
+        <span><h2 class="has-text-weight-normal pb-4 center">Simple Sentiment Analysis</h2></span>
+    </div>
+
+    <div id="form-content">
+        <p>Please, upload an Excel file (.xlsx) containing the textual feedback you want to analyze. The header will be ignored.</p>
+
+        <form class="mt-5" method="post" action="/analyze-sentiment" enctype="multipart/form-data" onsubmit="turn_button_to_loading_icon()" autocomplete="off">
+            <!--  File upload -->
+            <div class="field">
+                <label class="label">Upload file</label>
+                <div id="file-upload" class="file is-normal has-name is-fullwidth is-link">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="file" required
+                                accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                        <span class="file-cta">
+                        <span class="file-icon">
+                        <i class="mdi mdi-upload"></i>
+                        </span>
+                        <span class="file-label">
+                        Choose a file…
+                        </span>
+                    </span>
+                        <span class="file-name">
+                        No file uploaded
+                    </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Column input -->
+            <div class="field">
+                <label class="label">Letter of column containing text</label>
+                <input class="input" type="text" name="column-input" required placeholder="f.ex. A" pattern="^[a-zA-Z]+$">
+            </div>
+            
+            <!-- Analyze button -->
+            <div id="upload-button-container" class="control mt-5 center">
+                <button id="analyze-button" class="button is-fullwidth center is-link">
+                    <span class="icon is-small">
+                        <i class="mdi mdi-chart-bar"></i>
+                    </span>
+                    <span>Analyze</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

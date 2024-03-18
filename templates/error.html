@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<style>
+    footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<li>
+    <a href="{{ url_for('index') }}">
+        <span class="icon is-small">
+            <i class="mdi mdi-home-outline"></i>
+        </span>
+        <span>Home</span>
+    </a>
+</li>
+<li class="is-active"><a href="#" aria-current="page">Error</a></li>
+{% endblock %}
+
+{% block main %}
+<!-- TODO: Check styles and stuff -->
+<!-- Error message -->
+<div id="error-box" class="box">
+    <div id="error-content">
+        <div class="content results-container">
+            <h2 class="has-text-weight-normal pb-6 center">Oh no, something went wrong!</h2>
+            <article class="message is-danger">
+                <div class="message-header">
+                    <p>Error: </p>
+                </div>
+                <div class="message-body">
+                    <p>{{ errormessage }}</p>
+                </div>
+            </article>
+        </div>
+
+        <div class="block mb-4 mt-6">
+            <a class="button is-link is-light" href="{{ url_for('index') }}">
+                <span class="icon is-small">
+                        <i class="mdi mdi-restart"></i>
+                    </span>
+                <span>Try again</span>
+            </a>
+        </div>
+    </div>  
+</div>
+{% endblock %}

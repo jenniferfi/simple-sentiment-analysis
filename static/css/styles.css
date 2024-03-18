@@ -1,0 +1,37 @@
+html, body {
+    height: 100%;
+    background-color: rgb(244, 240, 255);
+}
+footer {
+    width: 100%;
+    text-align: center;
+    height: 80px;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-background {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0,0,0, 0.2);
+}
+#form-box, #error-box {
+    max-width: 800px;
+    margin: auto;
+    padding: 40px;
+}
+#index-img {
+    width: 200px;
+    margin: auto;
+}
+#form-content, #error-content {
+    max-width: 600px;
+    margin: auto;
+    padding-bottom: 30px;
+}
+
+.feedback-emoji {
+    width: 65%;
+    margin: auto;
+}

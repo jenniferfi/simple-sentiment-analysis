@@ -1,0 +1,19 @@
+# local contains virtualenv
+local
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.pyc
+__pycache__
+
+.DS_Store
+
+# Environmental variables
+.env

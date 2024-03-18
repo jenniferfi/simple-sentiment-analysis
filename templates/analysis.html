@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block breadcrumbs %}
+<li>
+    <a href="{{ url_for('index') }}">
+        <span class="icon is-small">
+            <i class="mdi mdi-home-outline"></i>
+        </span>
+        <span>Home</span>
+    </a>
+</li>
+<li class="is-active"><a href="#" aria-current="page">Analysis results</a></li>
+{% endblock %}
+
+{% block main %}
+<!-- Error message -->
+<div class="columns mx-2">
+    {% for sentiment in analysis %}
+        <div class="column m-2 p-5 box"> 
+            <img class="feedback-emoji center" src="{{ url_for('static', filename='images/' + sentiment + '.png')}}">
+            <h2 class="center">{{ sentiment | capitalize }} ({{ analysis[sentiment]["share"] }} %) </h2>
+            {% for text in analysis[sentiment]["texts"] %}
+                <p>"{{ text}}"</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+  </div>
+{% endblock %}

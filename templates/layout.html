@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment analysis tool</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Template specific styles -->
+    {% block styles %} {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jinja macros-->
+    {% from 'macros/modals.html' import modal %}
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <span class="icon is-large">
+            <i class="mdi mdi-thought-bubble-outline mdi-36px"></i>
+        </span>
+    </div>
+    <div class="navbar-start center">
+        <h1 id="navbar-title">Simple Sentiment Analysis</h1>
+    </div>
+    <div class="navbar-end">
+        <div class="navbar-item">
+            <span class="icon is-medium has-text-black is-clickable open-info-modal" data-target="info-modal">
+                <i class="mdi mdi-help-circle-outline mdi-24px"></i>
+            </span>
+        </div>
+    </div>
+</nav>
+<!-- /Navbar -->
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumb m-4 is-small" aria-label="breadcrumbs">
+    <ul>
+        {% block breadcrumbs %} {% endblock %}
+    </ul>
+</nav>
+<!-- /Breadcrumbs -->
+
+<!-- Main content -->
+<main>
+    <!--Content in box-->
+    <div class="m-5 pb-8 content">
+        {% block main %} {% endblock %}
+    </div>
+
+</main>
+
+
+<!-- Info modal -->
+{{ modal("info-modal", "Sentiment Analysis Tool",
+        ["Upload Excel etc.", "Other paragraph"
+        ])
+}}
+
+<!-- Footer -->
+<footer class="center background-dark m-0">
+    <p class="text-light">Simple Sentiment Analysis by <a href="https://github.com/jenniferfi">Jennifer Finnilä</a>.
+    </p>
+</footer>
+</body>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</html>
