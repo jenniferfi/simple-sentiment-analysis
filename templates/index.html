@@ -2,7 +2,11 @@
 
 {% block styles %}
 <style>
-
+    footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+    }
 </style>
 {% endblock %}
 
@@ -22,14 +26,13 @@
 <div id="form-box" class="box content">
 
     <div>
-        <span><img id="index-img" class="center" src="{{ url_for('static', filename='images/sentiment_meter.png')}}"></span>
         <span><h2 class="has-text-weight-normal pb-4 center">Simple Sentiment Analysis</h2></span>
     </div>
 
     <div id="form-content">
         <p>Please, upload an Excel file (.xlsx) containing the textual feedback you want to analyze. The header will be ignored.</p>
 
-        <form class="mt-5" method="post" action="/analyze-sentiment" enctype="multipart/form-data" onsubmit="turn_button_to_loading_icon()" autocomplete="off">
+        <form id="form" class="mt-5" method="post" action="/analyze-sentiment" enctype="multipart/form-data" onsubmit="turnButtonToLoadingIcon('analyze-button')" autocomplete="off">
             <!--  File upload -->
             <div class="field">
                 <label class="label">Upload file</label>
@@ -55,7 +58,7 @@
             <!-- Column input -->
             <div class="field">
                 <label class="label">Letter of column containing text</label>
-                <input class="input" type="text" name="column-input" required placeholder="f.ex. A" pattern="^[a-zA-Z]+$">
+                <input id="column-input" class="input" type="text" name="column-input" required placeholder="f.ex. A" pattern="^[a-zA-Z]+$">
             </div>
             
             <!-- Analyze button -->

@@ -5,11 +5,12 @@
     <title>Sentiment analysis tool</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- Template specific styles -->
     {% block styles %} {% endblock %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!--Jinja macros-->
     {% from 'macros/modals.html' import modal %}
 </head>
@@ -18,17 +19,17 @@
 <!-- Navbar -->
 <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <span class="icon is-large">
-            <i class="mdi mdi-thought-bubble-outline mdi-36px"></i>
-        </span>
+        <span><img id="logo" class="center" src="{{ url_for('static', filename='images/sentiment_meter.png')}}"></span>
     </div>
     <div class="navbar-start center">
-        <h1 id="navbar-title">Simple Sentiment Analysis</h1>
+        <a class="navbar-item" href="{{ url_for('index') }}">
+            <h1 id="navbar-title">Simple Sentiment Analysis</h1>
+        </a>
     </div>
     <div class="navbar-end">
         <div class="navbar-item">
-            <span class="icon is-medium has-text-black is-clickable open-info-modal" data-target="info-modal">
-                <i class="mdi mdi-help-circle-outline mdi-24px"></i>
+            <span class="icon is-large has-text-black is-clickable open-info-modal" data-target="info-modal">
+                <i class="mdi mdi-help-circle-outline mdi-36px"></i>
             </span>
         </div>
     </div>
@@ -55,7 +56,8 @@
 
 <!-- Info modal -->
 {{ modal("info-modal", "Sentiment Analysis Tool",
-        ["Upload Excel etc.", "Other paragraph"
+        ["Quick and simple sentiment analysis tool that lets user upload Excel containing textual feedback and provides a dashbord with sentiment analysis of the uploaded text.", 
+        "The sentiment analysis tool is built using a Flask server and the nltk Python library."
         ])
 }}
 
@@ -68,4 +70,5 @@
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+{% block scripts %} {% endblock %}
 </html>

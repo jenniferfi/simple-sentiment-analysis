@@ -13,16 +13,134 @@
 {% endblock %}
 
 {% block main %}
-<!-- Error message -->
+<!-- Analysis -->
+
+<!-- Charts -->
 <div class="columns mx-2">
-    {% for sentiment in analysis %}
-        <div class="column m-2 p-5 box"> 
-            <img class="feedback-emoji center" src="{{ url_for('static', filename='images/' + sentiment + '.png')}}">
-            <h2 class="center">{{ sentiment | capitalize }} ({{ analysis[sentiment]["share"] }} %) </h2>
-            {% for text in analysis[sentiment]["texts"] %}
-                <p>"{{ text}}"</p>
-            {% endfor %}
+    <div class="column m-2 p-5 box">
+        <h3 class="center">Amount of feedback, N</h3>
+        <canvas id="n-feedback"></canvas>
+    </div>
+    <div class="column m-2 p-5 box">
+        <h3 class="center">Overall sentiment %</h3>
+        <canvas id="overall-pie"></canvas>
+    </div>
+    <div class="column m-2 p-5 box">
+        <h3 class="center">Sentiment by Topic %</h3>
+        <canvas id="topic-sentiment-bar" style="max-height: 200px;"></canvas>
+    </div>
+</div>
+
+<!-- Feedback texts -->
+<div class="box mx-4">
+    <div class="tabs is-centered is-boxed">
+        <ul>
+        {% for topic in grouped_text %}
+          <li id="tab-{{topic}}" class="tab" onclick="openTab('{{topic}}')">
+            <a>
+              <span>{{ topic | capitalize }}</span>
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% for topic, data in grouped_text.items() %}
+        <div id="{{topic}}"  class="feedback-container">
+            <div class="columns m-2">
+                {% for sentiment, feedback in data.items() %}
+                    <div class="column"> 
+                        <img class="feedback-emoji center" src="{{ url_for('static', filename='images/' + sentiment + '.png')}}">
+                        <h4 class="center pt-2">{{ sentiment | capitalize }} comments </h4>
+                        <div class="feedback-column scrollable p-4">
+                            {% for text in feedback %}
+                                <p>"{{ text}}"</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-    {% endfor %}
-  </div>
+    {% endfor %}   
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Page specific scripts -->
+<script>
+    const feedbackTotals = document.getElementById('n-feedback');
+    const byTopicBar = document.getElementById('topic-sentiment-bar');
+    const overallPie = document.getElementById('overall-pie')
+    
+    let chartData = JSON.parse('{{ charts|tojson|safe }}');
+
+new Chart(feedbackTotals, {
+  type: 'bar',
+  data: {
+  labels: chartData['n-feedback']['labels'],
+  datasets: [{
+    data: chartData['n-feedback']['data'],
+    backgroundColor: chartData['n-feedback']['color'],
+  }]
+},
+  options: {
+    indexAxis: 'y',
+    plugins: {
+        legend: {
+        display: false
+    }
+  }
+  }
+});
+
+new Chart(overallPie, {
+    type: 'pie',
+    data: {
+      labels: chartData['overall-pie']['labels'],
+      datasets: [{
+        data: chartData['overall-pie']['data'],
+        backgroundColor: chartData['overall-pie']['colors'],
+        hoverOffset: 4
+        }]
+    },
+  });
+
+new Chart(byTopicBar, {
+    type: 'bar',
+    data: {
+        labels: chartData['topic-sentiment']['labels'],
+        datasets: chartData['topic-sentiment']['data']
+    }, 
+    options: { 
+        indexAxis: 'y', 
+        scales: { 
+            x: { 
+                stacked: true, 
+            }, 
+            y: { 
+                stacked: true 
+            } 
+        }, 
+        responsive: true 
+    } 
+});
+
+function openTab(tabName) {
+    let tabs = document.getElementsByClassName("feedback-container");
+    for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = "none";
+    }
+    
+    let tablinks = document.getElementsByClassName("tab");
+    for (let i = 0; i < tabs.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" is-active", "");
+    }
+    
+    document.getElementById(tabName).style.display = "block";
+    document.getElementById('tab-'+ tabName).className += " is-active";
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    openTab('overall');
+});
+</script>
 {% endblock %}

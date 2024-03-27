@@ -1,6 +1,8 @@
-function displaySelectedFileName() {
-  const fileInput = document.querySelector('#file-upload input[type=file]');
+const form = document.querySelector('#form');
+const fileInput = document.querySelector('#file-upload input[type=file]');
+const analyzeButton = document.querySelector('#analyze-button');
 
+function displaySelectedFileName() {
   if (fileInput != null) {
     fileInput.onchange = () => {
       if (fileInput.files.length > 0) {
@@ -11,34 +13,15 @@ function displaySelectedFileName() {
   }
 }
 
-window.addEventListener('pageshow', () => {
-  displaySelectedFileName();
-});
-
-// TODO: Need all these?
 function turnButtonToLoadingIcon(btnId) {
   let button = document.querySelector(`#${btnId}`);
   button.classList.add('is-loading');
 }
 
-function disableButton(btnIds) {
-  btnIds.forEach((element)=>
-      document.querySelector(`#${element}`).setAttribute('disabled', '')
-  );
-}
-
-function showElement(id){
-    let element = document.getElementById(id);
-    element.classList.remove('hidden');
-}
-
-function hideElement(id) {
-    let element = document.getElementById(id);
-    element.classList.add('hidden');
-}
-
-// Modals
 document.addEventListener('DOMContentLoaded', () => {
+
+  displaySelectedFileName();
+
   // Functions to open and close a modal
   function openModal($el) {
     $el.classList.add('is-active');
@@ -75,9 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add a keyboard event to close all modals
   document.addEventListener('keydown', (event) => {
-    const e = event || window.event;
-
-    if (e.keyCode === 27) { // Escape key
+    if (event.key === "Escape") {
       closeAllModals();
     }
   });

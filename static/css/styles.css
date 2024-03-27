@@ -1,6 +1,6 @@
 html, body {
     height: 100%;
-    background-color: rgb(244, 240, 255);
+    background-color: #cfe2f3;
 }
 footer {
     width: 100%;
@@ -21,9 +21,9 @@ footer {
     margin: auto;
     padding: 40px;
 }
-#index-img {
-    width: 200px;
-    margin: auto;
+#logo {
+    max-width: 120px;
+    padding: 8px;
 }
 #form-content, #error-content {
     max-width: 600px;
@@ -32,6 +32,47 @@ footer {
 }
 
 .feedback-emoji {
-    width: 65%;
+    max-width: 100px;
     margin: auto;
+}
+
+.feedback-column {
+    background-color: #f4f2f8;
+    height: 500px;
+}
+
+#overall-pie {
+    max-height: 200px;
+}
+.scrollable {
+    overflow-y: scroll;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 15px;
+  }
+  
+.scrollable::-webkit-scrollbar-track {
+background-color: transparent;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+background-color: #e0dde7;
+border-radius: 20px;
+border: 4px solid transparent;
+background-clip: content-box;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+background-color: #f4f0fb;
+}
+
+/* Bulma overrides */
+.breadcrumb {
+    --bulma-breadcrumb-item-separator-color: var(--bulma-text);
+}
+:root {
+    --bulma-link-h: 220;
+    --bulma-link-s: 50%;
+    --bulma-link-l: 50%;
 }

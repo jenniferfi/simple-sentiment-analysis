@@ -1,5 +1,5 @@
 # local contains virtualenv
-local
+local/
 
 # Editor directories and files
 .idea

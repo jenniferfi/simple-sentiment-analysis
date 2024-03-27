@@ -10,6 +10,7 @@ import pandas as pd
 
 from flask import Flask, render_template, request
 from nltk.sentiment import SentimentIntensityAnalyzer
+from nltk.stem import WordNetLemmatizer
 from openpyxl.utils import column_index_from_string
 
 
@@ -22,14 +23,18 @@ debug = os.environ.get("DEBUG", False)
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('vader_lexicon')
+nltk.download('wordnet')
 
-analyzer = SentimentIntensityAnalyzer()
 
-# TODO: Development idea: keywords on topics
+# TODO: Idea: login to keep track of historical data? --> database + google authentication
+
+sentiments = ["positive", "neutral", "negative"]
 
 def analyze_sentiment(texts: list) -> list:
-    """ Analyze text input with nltk. """
+    """ Calculate vader scores for text input. """
+    analyzer = SentimentIntensityAnalyzer() 
     vader_scores = []
+
     for text in texts:
         try:
             scores = analyzer.polarity_scores(text)
@@ -37,13 +42,48 @@ def analyze_sentiment(texts: list) -> list:
         except (TypeError, ValueError) as e:
             print(f"Error analyzing sentiment for text '{text}': {e}")
             return []
+
     return vader_scores
 
 
-def format_results(texts, vader_scores) -> dict:
-    """ Group text by sentiment and calculate share of positive, negative and neutral feedback. """
-    sentiments = ["positive", "neutral", "negative"]
-    analysis = { sentiment: {"texts": [], "share": 0} for sentiment in sentiments}
+def contains_lemmatized_keyword(text: str, keywords: list) -> bool:
+  """ Check if text input matches lemmatized keyword. """
+  # Create a lemmatizer object
+  lemmatizer = WordNetLemmatizer()
+  # Lemmatize the text and keywords
+  text_lemma = lemmatizer.lemmatize(text.lower())
+  lemmatized_keywords = [lemmatizer.lemmatize(keyword) for keyword in keywords]
+  return any(keyword in text_lemma for keyword in lemmatized_keywords) 
+
+
+def categorize_text(text_input):
+    """ Sort text input into topic categories if they contain defined keywords for topic category. """
+    # Define categories and keywords
+    category_keywords = {
+        'product': ['product', 'item', 'quality', 'feature', 'design', 'selection', ],
+        'delivery': ['delivery', 'ship', 'receive', 'arrive'],
+        'service': ['email', 'support', 'help', 'service', 'customer'],
+        'price': ['price', 'expensive', 'dollar', 'value', 'afford', 'budget']
+    }
+
+    categorized_text = { category: [] for category in category_keywords}
+    
+    for text in text_input:
+        text_lower = text.lower()
+        
+        # Check for matches in each category
+        for category, keywords in category_keywords.items():
+            if contains_lemmatized_keyword(text_lower, keywords):
+                categorized_text[category].append(text)
+
+    return categorized_text
+
+
+def group_by_sentiment(texts: list, vader_scores: list) -> dict:
+    """ Group text by sentiment and rank text from strongest sentiment to weakest """
+    feedback_by_sentiment = {
+        sentiment: [] for sentiment in sentiments
+    }
 
     try:
         assert len(texts) == len(vader_scores)
@@ -54,16 +94,101 @@ def format_results(texts, vader_scores) -> dict:
     for idx, text in enumerate(texts):
         score = vader_scores[idx]["compound"]
         if score > 0:
-            analysis["positive"]["texts"].append(text)
+            feedback_by_sentiment["positive"].append((text, score))
         elif score < 0:
-            analysis["negative"]["texts"].append(text)
+            feedback_by_sentiment["negative"].append((text, score))
         else:
-            analysis["neutral"]["texts"].append(text)
+            feedback_by_sentiment["neutral"].append((text, score))
 
-    for sentiment in sentiments:
-        analysis[sentiment]["share"] = round(len(analysis[sentiment]["texts"])/len(texts) * 100)
+    # Sort texts from strongest sentiment to weakest and keep only text
+    for sentiment, feedback in feedback_by_sentiment.items():
+        feedback_by_sentiment[sentiment] = sorted(feedback, key=lambda x: abs(x[1]), reverse=True)
+        feedback_by_sentiment[sentiment] = [item[0] for item in feedback_by_sentiment[sentiment]]
 
-    return analysis
+    return feedback_by_sentiment
+
+
+def format_results(all_texts: list, by_topic: dict):
+    results = {}
+
+    try:           
+        if overall_vader := analyze_sentiment(all_texts):
+            results['overall'] = group_by_sentiment(all_texts, overall_vader)
+        
+        for topic, texts in by_topic.items():
+            print(topic, texts)
+            if vader_scores := analyze_sentiment(texts):
+                results[topic] = group_by_sentiment(texts, vader_scores)
+    
+    except Exception as e:
+        print(f"Error formatting results: {str(e)}")
+
+    return results
+
+
+def format_charts(data: dict) -> dict:
+    """ Calculate and format chart data. """
+
+    charts = {}
+
+    green = '#8bcb90'
+    yellow = '#ffbf5b'
+    red = '#ae2c36'
+    teal = '#2980b9'
+
+    # Calculate amounts of feedback and their sentiment distribution
+    n_feedback = []
+    distribution = {}
+    for topic in data:
+        n_total = sum(len(sentiments) for sentiments in data[topic].values())
+        n_feedback.append(n_total)
+        distribution[topic] = [round(len(data[topic][sent])/n_total * 100, 2) if n_total else 0 for sent in sentiments]
+
+    # Bar chart displaying amount of feedback overall and for each topic
+    charts['n-feedback'] = {
+        'labels': [key.capitalize() for key in data.keys()],
+        'data': n_feedback,
+        'color': teal
+    }
+
+    # Pie chart displaying distribution of sentiments for feedback overall
+    charts['overall-pie'] = {
+        'labels': [sentiment.capitalize() for sentiment in sentiments],
+        'data': distribution['overall'],
+        'colors': [green, yellow, red]
+    }
+
+    # Stacked bar chart displaying distribution of sentiments for each topic
+    labels = []
+    positives = []
+    neutrals = []
+    negatives = []
+
+    for topic, data in distribution.items():
+        if topic != 'overall':
+            labels.append(topic.capitalize())
+            positives.append(data[0])
+            neutrals.append(data[1])
+            negatives.append(data[2])
+
+    charts['topic-sentiment'] = {
+        'labels': labels,
+        'data': [{ 
+                    'label': 'Positive', 
+                    'backgroundColor': green, 
+                    'data': positives, 
+                }, { 
+                    'label': 'Neutral', 
+                    'backgroundColor': yellow, 
+                    'data': neutrals, 
+                }, { 
+                    'label': 'Negative', 
+                    'backgroundColor': red, 
+                    'data': negatives, 
+                }]
+    }
+
+    return charts
 
 
 @app.route('/')
@@ -92,6 +217,7 @@ def process_file():
 
         # Read uploaded file and transform content of chosen column to list
         try:
+            # TODO: Maybe clean data in some way?
             df = pd.read_excel(file)
             text_input = df.iloc[:, column].tolist()
         except (ValueError, TypeError, MemoryError, FileNotFoundError) as e:
@@ -99,15 +225,28 @@ def process_file():
             msg = 'Please, make sure you choose a column that contains text.'
             return render_template('error.html', errormessage=msg)
 
+        n_feedback = len(text_input)
+        try:
+            text = ' '.join(text_input)
+            sentences = nltk.sent_tokenize(text)
+        except Exception as e:
+            print("Could not turn text into sentences")
+            return render_template('error.html', errormessage=str(e))
+
         # Analyse and format results if text input is found
-        if len(text_input) > 0:
-            if sentiment_scores := analyze_sentiment(text_input):
-                if analysis := format_results(text_input, sentiment_scores):
-                    return render_template('analysis.html', analysis=analysis)
+        # TODO: Maybe try / except this part - or less if levels and more render error if not?
+        if n_feedback > 0:
+            if feedback_by_topic := categorize_text(sentences):
+                if grouped_text := format_results(text_input, feedback_by_topic):
+                    if charts := format_charts(grouped_text):
+                        return render_template('analysis.html',
+                                                grouped_text=grouped_text, 
+                                                charts=charts)
 
     msg = 'Could not perform the sentiment analysis. Please check that your file and column contains text.'
     return render_template('error.html', errormessage=msg)
 
 
+#TODO: gunicorn for deployment
 if __name__ == '__main__':
     app.run(debug=True, host=os.environ.get("HOST", "0.0.0.0"), port=os.environ.get("PORT", "20084"))
