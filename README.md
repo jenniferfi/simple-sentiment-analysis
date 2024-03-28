@@ -4,7 +4,10 @@ The text is categorized into predefined topics using WordNetLemmatizer from NLTK
 The sentiment analysis uses VADER lexicon from NLTK.
 The application itself is built with Flask.
 
-<!-- TODO: Add some images -->
+Test the application f.ex. with the included .xlsx file.
+
+The analysis will look something like this.
+![Screenshot of analysis page](app/static/images/app.png?raw=true)
 
 ## Local development 
 
