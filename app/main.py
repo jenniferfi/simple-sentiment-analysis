@@ -200,7 +200,7 @@ def process_file():
     if request.method == 'POST':
         # Check that file is provided
         if 'file' not in request.files:
-            return render_template('error.html', errormessage='No "file" in request.')
+            return render_template('error.html', errormessage='No file in request.')
 
         file = request.files['file']
 

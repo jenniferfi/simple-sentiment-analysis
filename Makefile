@@ -1,6 +1,9 @@
 lint:
 	pylint --max-line-length=120 app/*.py
 
+test:
+	pytest
+
 build:
 	docker build -t sentiment-analysis:latest .
 
