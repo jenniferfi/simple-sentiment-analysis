@@ -6,7 +6,7 @@ The application itself is built with Flask.
 
 Test the application f.ex. with the included .xlsx file.
 
-The analysis will look something like this.
+Testing the application with the included Excel file, the analysis page looks like this.
 ![Screenshot of analysis page](app/static/images/app.png?raw=true)
 
 ## Local development 
@@ -41,6 +41,11 @@ DEBUG=True python app/main.py
 ### Lint python files 
 ```bash
 make lint
+```
+
+### Test python files
+```bash
+make test
 ```
 
 ## Deployment process
